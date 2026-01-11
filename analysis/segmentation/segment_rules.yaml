@@ -1,0 +1,129 @@
+# Segment Rules (Machine-Readable)
+#
+# PURPOSE: Define rules for auto-classifying accounts into segments.
+# Pipelines use this file to assign segment labels.
+#
+# HOW TO USE:
+# In pipelines/segment.py:
+#   import yaml
+#   with open('analysis/segmentation/segment_rules.yaml') as f:
+#       rules = yaml.safe_load(f)
+#   # Apply rules to classify accounts
+#
+# KEEP IN SYNC with analysis/segmentation/segments.md
+
+segments:
+  midmarket_fintech:
+    label: "Mid-Market Fintech"
+    rules:
+      industry:
+        - "Financial Services"
+        - "Fintech"
+        - "Digital Banking"
+        - "Payments"
+      headcount:
+        min: 200
+        max: 1000
+      revenue_arr:
+        min: 10000000  # $10M
+        max: 100000000  # $100M
+      additional_criteria:
+        - field: "tech_stack"
+          contains: ["AWS", "GCP", "Azure"]  # Cloud-native indicator
+        - field: "funding_stage"
+          in: ["Series B", "Series C", "Series D"]
+
+  smb_saas:
+    label: "SMB SaaS"
+    rules:
+      industry:
+        - "SaaS"
+        - "Software"
+      headcount:
+        min: 10
+        max: 100
+      revenue_arr:
+        min: 1000000  # $1M
+        max: 10000000  # $10M
+      funding_stage:
+        - "Seed"
+        - "Series A"
+
+  # Add more segments here
+  # enterprise_healthcare:
+  #   label: "Enterprise Healthcare"
+  #   rules:
+  #     industry: ["Healthcare", "Health IT"]
+  #     headcount:
+  #       min: 1000
+  #     ...
+
+# Segment Priority (if account matches multiple segments)
+# Order matters - earlier segments take precedence
+segment_priority:
+  - midmarket_fintech
+  - smb_saas
+  # - enterprise_healthcare
+
+# Size Buckets (Generic)
+# Use these if industry-specific segments don't apply
+size_buckets:
+  smb:
+    label: "SMB"
+    headcount:
+      min: 1
+      max: 200
+  midmarket:
+    label: "Mid-Market"
+    headcount:
+      min: 200
+      max: 2000
+  enterprise:
+    label: "Enterprise"
+    headcount:
+      min: 2000
+
+# Usage Example in Python:
+#
+# import yaml
+# import pandas as pd
+#
+# # Load rules
+# with open('analysis/segmentation/segment_rules.yaml') as f:
+#     config = yaml.safe_load(f)
+#
+# # Load accounts
+# df = pd.read_parquet('source/crm/derived/accounts_enriched.parquet')
+#
+# # Classify accounts
+# def classify_segment(row):
+#     for segment_key in config['segment_priority']:
+#         segment = config['segments'][segment_key]
+#         rules = segment['rules']
+#
+#         # Check industry
+#         if row['industry'] not in rules.get('industry', []):
+#             continue
+#
+#         # Check headcount
+#         if 'headcount' in rules:
+#             if not (rules['headcount']['min'] <= row['headcount'] <= rules['headcount']['max']):
+#                 continue
+#
+#         # Check revenue
+#         if 'revenue_arr' in rules:
+#             if not (rules['revenue_arr']['min'] <= row['arr'] <= rules['revenue_arr']['max']):
+#                 continue
+#
+#         # If all rules match, return segment label
+#         return segment['label']
+#
+#     # If no specific segment matches, use size bucket
+#     for bucket_key, bucket in config['size_buckets'].items():
+#         if bucket['headcount']['min'] <= row['headcount'] <= bucket['headcount']['max']:
+#             return bucket['label']
+#
+#     return 'Unknown'
+#
+# df['segment'] = df.apply(classify_segment, axis=1)
+# print(df[['account_id', 'account_name', 'industry', 'headcount', 'segment']])

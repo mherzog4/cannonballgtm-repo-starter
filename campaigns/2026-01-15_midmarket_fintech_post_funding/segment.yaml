@@ -1,0 +1,76 @@
+# Campaign Segment Definition (Machine-Readable)
+#
+# This file defines exactly which accounts to target in this campaign.
+# Referenced by pipelines/campaign_pull.py
+
+campaign:
+  name: "Mid-Market Fintech Post-Funding"
+  start_date: "2026-01-15"
+  owner: "[Your Name]"
+
+# Base segment from analysis/segmentation/
+base_segment:
+  label: "midmarket_fintech"
+  source: "analysis/segmentation/segment_rules.yaml"
+
+# Additional filters for THIS campaign
+filters:
+  # Funding filter
+  last_funding_date:
+    after: "2025-07-01"  # Last 6 months
+    funding_rounds: ["Series B", "Series C"]
+
+  # Firmographic
+  headcount:
+    min: 200
+    max: 1000
+
+  industry:
+    - "Fintech"
+    - "Financial Services"
+    - "Digital Banking"
+    - "Payments"
+
+  geography:
+    - "North America"
+
+  # Tech stack indicator (cloud-native)
+  tech_stack_includes:
+    - "AWS"
+    - "GCP"
+    - "Azure"
+
+# Exclusions
+exclusions:
+  # Don't target if we already reached out in last 90 days
+  recent_outreach_within_days: 90
+
+  # Don't target existing customers
+  is_customer: false
+
+  # Don't target if in active opportunity
+  has_open_opportunity: false
+
+# Enrich with these fields
+enrich_fields:
+  - "last_funding_amount"
+  - "last_funding_date"
+  - "recent_job_postings"
+  - "recent_news"
+  - "linkedin_growth_rate"
+
+# Output
+output:
+  file: "pulled_customers.csv"
+  limit: 100  # Max accounts to pull
+  fields:
+    - "account_id"
+    - "account_name"
+    - "industry"
+    - "headcount"
+    - "last_funding_date"
+    - "last_funding_amount"
+    - "recent_job_postings_count"
+    - "primary_contact_id"
+    - "primary_contact_email"
+    - "primary_contact_job_title"

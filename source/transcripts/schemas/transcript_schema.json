@@ -1,0 +1,126 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Call Transcript Schema",
+  "description": "Schema for sales call transcripts exported from Gong, Chorus, or similar tools. Update this to match your transcript provider's format.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["transcript_id", "call_date", "transcript_text"],
+    "properties": {
+      "transcript_id": {
+        "type": "string",
+        "description": "Unique identifier for this call (from Gong/Chorus/etc.)",
+        "example": "call_a7b3c9d2-1234-5678-9abc-def012345678"
+      },
+      "opportunity_id": {
+        "type": "string",
+        "description": "Linked opportunity ID from CRM (if available). This is your join key to connect transcripts to deals.",
+        "example": "0061234567ABCDEFGH"
+      },
+      "account_id": {
+        "type": "string",
+        "description": "Linked account ID from CRM (if opportunity_id not available)",
+        "example": "0011234567ABCDEFGH"
+      },
+      "call_date": {
+        "type": "string",
+        "format": "date-time",
+        "description": "When the call happened",
+        "example": "2026-01-05T14:30:00Z"
+      },
+      "duration_seconds": {
+        "type": "integer",
+        "description": "Call length in seconds",
+        "example": 1847
+      },
+      "call_type": {
+        "type": "string",
+        "description": "Type of call",
+        "enum": ["discovery", "demo", "negotiation", "onboarding", "other"],
+        "example": "discovery"
+      },
+      "transcript_text": {
+        "type": "string",
+        "description": "Full transcript content. Consider redacting PII before committing.",
+        "example": "Rep: Thanks for joining today. Can you tell me about your current deployment process?\nProspect: We're using Jenkins and it's become really brittle..."
+      },
+      "speakers": {
+        "type": "array",
+        "description": "List of speaker labels (optional: can be derived during analysis)",
+        "items": {
+          "type": "string",
+          "enum": ["Rep", "Champion", "Economic Buyer", "Technical Buyer", "End User", "Unknown"]
+        },
+        "example": ["Rep", "Champion", "Technical Buyer"]
+      },
+      "sentiment": {
+        "type": "string",
+        "description": "Overall call sentiment (if provided by tool, or derived)",
+        "enum": ["Positive", "Neutral", "Negative"],
+        "example": "Positive"
+      },
+      "key_moments": {
+        "type": "array",
+        "description": "Important moments flagged by your tool (optional)",
+        "items": {
+          "type": "object",
+          "properties": {
+            "timestamp": {
+              "type": "integer",
+              "description": "Seconds into call"
+            },
+            "label": {
+              "type": "string",
+              "description": "What happened",
+              "example": "Pricing discussion"
+            }
+          }
+        }
+      },
+      "recording_url": {
+        "type": "string",
+        "format": "uri",
+        "description": "Link back to recording in Gong/Chorus (optional)",
+        "example": "https://app.gong.io/call?id=123456"
+      }
+    }
+  },
+  "comments": [
+    "HOW TO USE THIS SCHEMA:",
+    "1. Export transcripts from Gong/Chorus as JSONL (one JSON object per line)",
+    "2. Store raw exports in source/transcripts/raw/gong_exports_YYYY-MM-DD.jsonl",
+    "3. Normalize to this schema and save to source/transcripts/normalized/transcripts.parquet",
+    "",
+    "WHY PARQUET FOR NORMALIZED?",
+    "- Much smaller file size (10x compression typical)",
+    "- Faster to query with pandas/duckdb",
+    "- Columnar format good for analytics",
+    "",
+    "NORMALIZATION EXAMPLE (Python):",
+    "import pandas as pd",
+    "import hashlib",
+    "",
+    "# Load raw JSONL from Gong",
+    "df = pd.read_json('source/transcripts/raw/gong_exports_2026-01-10.jsonl', lines=True)",
+    "",
+    "# Redact PII in transcript_text (see docs/privacy_and_redaction.md)",
+    "df['transcript_text'] = df['transcript_text'].apply(redact_pii)",
+    "",
+    "# Save normalized version",
+    "df.to_parquet('source/transcripts/normalized/transcripts.parquet')",
+    "",
+    "CONNECTING TO DEALS:",
+    "The key field is opportunity_id - make sure your tool is configured",
+    "to log Salesforce Opportunity ID in call metadata.",
+    "",
+    "If opportunity_id is missing, you may need to:",
+    "1. Join by account_id + date range (calls during deal timeframe)",
+    "2. Create manual mapping table in source/joins/mappings/",
+    "",
+    "ANALYZING TRANSCRIPTS:",
+    "Use prompts from prompts/ directory to extract:",
+    "- Situational changes (prompts/situational_change_extraction.md)",
+    "- Persona identification (prompts/transcript_labeling.md)",
+    "- Win/loss themes (prompts/win_loss_analysis.md)"
+  ]
+}

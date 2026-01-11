@@ -1,0 +1,23 @@
+account_id,opportunity_id,segment,situational_change,evidence_source,evidence_date,deal_outcome,notes
+# This is your structured evidence table for situational changes
+#
+# HOW TO USE:
+# 1. After analyzing transcripts, add rows for each situational change you identify
+# 2. Include evidence source (transcript, news, LinkedIn, etc.)
+# 3. Track deal outcome (won/lost) to validate which triggers matter
+# 4. Use this data to find patterns and prioritize triggers
+#
+# COLUMNS:
+# - account_id: From CRM
+# - opportunity_id: From CRM
+# - segment: Which segment (from analysis/segmentation/)
+# - situational_change: What changed (funding, new_hire, outage, etc.)
+# - evidence_source: Where you found this (transcript, crunchbase, linkedin)
+# - evidence_date: When the change happened
+# - deal_outcome: won/lost/open
+# - notes: Additional context
+#
+# EXAMPLE ROWS:
+# 001ABC,006XYZ,midmarket_fintech,series_b_funding,crunchbase,2025-11-15,won,"Raised $25M, 3 months before deal closed"
+# 002DEF,007UVW,midmarket_fintech,new_vp_engineering,linkedin,2025-10-01,won,"New VP joined, reached out in month 2"
+# 003GHI,008RST,smb_saas,production_outage,twitter,2025-12-05,won,"Payment outage mentioned in transcript, 2 weeks before first call"

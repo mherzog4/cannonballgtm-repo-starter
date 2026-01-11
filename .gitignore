@@ -1,0 +1,152 @@
+# GTM Repository .gitignore
+
+# ============================================
+# CRITICAL: Privacy & Sensitive Data
+# ============================================
+
+# Raw, unredacted data (never commit PII)
+source/*/raw/
+**/*_unredacted.csv
+**/*_raw.csv
+**/*_raw.json
+
+# Mapping files that connect anonymized data to real identities
+.local/
+**/mappings/*_mapping.csv
+**/mappings/*_deidentification.csv
+
+# API keys and credentials
+.env
+.env.local
+.env.*.local
+**/*.pem
+**/*.key
+**/credentials.json
+**/secrets.yaml
+
+# Database exports with PII
+*.db
+*.sqlite
+*.sqlite3
+
+# ============================================
+# Temporary & Cache Files
+# ============================================
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# ============================================
+# Large Files / Build Artifacts
+# ============================================
+
+# Compressed archives
+*.zip
+*.tar.gz
+*.rar
+
+# Large data files (use Git LFS if needed)
+# *.parquet  # Uncomment if parquet files are too large
+
+# ============================================
+# Temporary Working Files
+# ============================================
+
+# Campaign working files that haven't been cleaned up
+campaigns/*/temp/
+campaigns/*/_scratch/
+
+# Research snapshots that are too large
+# research/snapshots/**/*.json  # Uncomment if snapshots are huge
+
+# Temporary exports for AI analysis
+temp_*.json
+temp_*.jsonl
+temp_*.csv
+
+# ============================================
+# OS Files
+# ============================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+# ============================================
+# Optional: Commit These If You Want
+# ============================================
+
+# Uncomment if you want to exclude large derived datasets
+# source/crm/derived/*.parquet
+# source/transcripts/normalized/*.parquet
+
+# Uncomment if enrichment outputs are too large or change frequently
+# source/enrichment/outputs/*
+
+# ============================================
+# Git LFS (if you use it for large files)
+# ============================================
+
+# Track parquet files with Git LFS
+# *.parquet filter=lfs diff=lfs merge=lfs -text
+
+# ============================================
+# Notes
+# ============================================
+
+# This .gitignore is designed for privacy-first GTM repos.
+# Key principle: Never commit raw PII. Always redact first.
+#
+# If you accidentally commit sensitive data:
+# 1. Make repo private immediately
+# 2. Use `git filter-branch` or `git filter-repo` to remove from history
+# 3. Notify affected parties if required
+# 4. Update this .gitignore to prevent future accidents
+#
+# See docs/privacy_and_redaction.md for full guidelines.

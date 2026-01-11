@@ -1,0 +1,166 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CRM Export Schema",
+  "description": "Schema for CRM data exports. Update this as your CRM structure evolves. This helps validate data quality and serves as documentation.",
+  "type": "object",
+  "properties": {
+    "accounts": {
+      "type": "array",
+      "description": "Company/organization records from your CRM",
+      "items": {
+        "type": "object",
+        "required": ["account_id", "account_name"],
+        "properties": {
+          "account_id": {
+            "type": "string",
+            "description": "Unique identifier from CRM (e.g., Salesforce 18-char ID)",
+            "example": "0011234567ABCDEFGH"
+          },
+          "account_name": {
+            "type": "string",
+            "description": "Company name",
+            "example": "Acme Corporation"
+          },
+          "industry": {
+            "type": "string",
+            "description": "Industry classification (add from enrichment if not in CRM)",
+            "example": "Financial Services"
+          },
+          "headcount": {
+            "type": "integer",
+            "description": "Number of employees (add from enrichment if not in CRM)",
+            "example": 450
+          },
+          "region": {
+            "type": "string",
+            "description": "Geographic region",
+            "example": "North America"
+          },
+          "created_date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When account was created in CRM"
+          }
+        }
+      }
+    },
+    "opportunities": {
+      "type": "array",
+      "description": "Sales deals/opportunities from your CRM",
+      "items": {
+        "type": "object",
+        "required": ["opportunity_id", "account_id", "stage", "amount"],
+        "properties": {
+          "opportunity_id": {
+            "type": "string",
+            "description": "Unique identifier for this deal",
+            "example": "0061234567ABCDEFGH"
+          },
+          "account_id": {
+            "type": "string",
+            "description": "Foreign key to account",
+            "example": "0011234567ABCDEFGH"
+          },
+          "opportunity_name": {
+            "type": "string",
+            "description": "Deal name",
+            "example": "Acme Corp - New Business"
+          },
+          "stage": {
+            "type": "string",
+            "description": "Current deal stage",
+            "enum": ["Prospecting", "Qualification", "Proposal", "Negotiation", "Closed Won", "Closed Lost"],
+            "example": "Proposal"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Deal value in dollars",
+            "example": 24000.00
+          },
+          "close_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Expected or actual close date",
+            "example": "2026-01-15"
+          },
+          "is_won": {
+            "type": "boolean",
+            "description": "Did we win this deal?",
+            "example": true
+          },
+          "is_closed": {
+            "type": "boolean",
+            "description": "Is deal closed (won or lost)?",
+            "example": true
+          },
+          "created_date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When opportunity was created"
+          }
+        }
+      }
+    },
+    "contacts": {
+      "type": "array",
+      "description": "Individual people at accounts",
+      "items": {
+        "type": "object",
+        "required": ["contact_id", "account_id"],
+        "properties": {
+          "contact_id": {
+            "type": "string",
+            "description": "Unique identifier for this person",
+            "example": "0031234567ABCDEFGH"
+          },
+          "account_id": {
+            "type": "string",
+            "description": "Foreign key to account",
+            "example": "0011234567ABCDEFGH"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email address (will be hashed for privacy)",
+            "example": "john.doe@acme.com"
+          },
+          "job_title": {
+            "type": "string",
+            "description": "Current role",
+            "example": "VP of Engineering"
+          },
+          "created_date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When contact was added to CRM"
+          }
+        }
+      }
+    }
+  },
+  "comments": [
+    "HOW TO USE THIS SCHEMA:",
+    "1. Export your CRM data to CSV files (one per entity: accounts, opportunities, contacts)",
+    "2. Validate against this schema to ensure data quality",
+    "3. Update this schema when your CRM structure changes",
+    "",
+    "VALIDATION EXAMPLE (Python):",
+    "import jsonschema",
+    "import json",
+    "",
+    "with open('source/crm/schemas/crm_schema.json') as f:",
+    "    schema = json.load(f)",
+    "",
+    "# Validate your data",
+    "jsonschema.validate(instance=your_data, schema=schema)",
+    "",
+    "HISTORICAL ARR:",
+    "To track customer growth over time, export ARR snapshots periodically.",
+    "Store in source/crm/derived/arr_history.csv with columns:",
+    "- account_id",
+    "- snapshot_date",
+    "- arr",
+    "",
+    "This lets you segment by 'customers who grew 50%+ in last year'"
+  ]
+}

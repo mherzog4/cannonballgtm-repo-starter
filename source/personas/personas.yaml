@@ -1,0 +1,218 @@
+# Persona Definitions (YAML Format)
+#
+# PURPOSE: Machine-readable persona data for use in pipelines and AI agents.
+# This complements persona_taxonomy.md with structured data.
+#
+# HOW TO USE:
+# - Load in Python/analysis scripts for persona-based filtering
+# - Reference in prompt templates for messaging generation
+# - Use in campaigns/*/personas.yaml to specify target personas
+#
+# WHAT TO FILL IN:
+# - Replace example values with your actual persona data
+# - Keep consistent with persona_taxonomy.md
+# - Add/remove personas as your buying committee evolves
+
+personas:
+  champion:
+    label: "Champion"
+    emoji: "🏆"
+    description: "Internal advocate who wants your solution to win"
+    typical_titles:
+      - "Senior Engineer"
+      - "DevOps Lead"
+      - "Engineering Manager"
+      - "Technical Lead"
+      - "Staff Engineer"
+    seniority_levels:
+      - "Individual Contributor"
+      - "Manager"
+    cares_about:
+      - "Making their job easier"
+      - "Technical quality"
+      - "Looking good to their team"
+      - "Career growth"
+    messaging_emphasis:
+      - "Time saved"
+      - "Technical elegance"
+      - "Ease of use"
+      - "Internal advocacy materials"
+    questions_they_ask:
+      - "How long does it take to get started?"
+      - "Can I try it before committing?"
+      - "How do I convince my boss?"
+      - "What does the migration path look like?"
+
+  economic_buyer:
+    label: "Economic Buyer"
+    emoji: "💰"
+    description: "Controls budget and makes final purchasing decision"
+    typical_titles:
+      - "VP Engineering"
+      - "CTO"
+      - "Director of Engineering"
+      - "Head of DevOps"
+      - "Engineering Lead"
+    seniority_levels:
+      - "Director"
+      - "VP"
+      - "C-Level"
+    cares_about:
+      - "ROI and business impact"
+      - "Risk mitigation"
+      - "Team productivity"
+      - "Cost vs. alternatives"
+    messaging_emphasis:
+      - "Business outcomes"
+      - "Cost savings"
+      - "Time to value"
+      - "Risk of doing nothing"
+    questions_they_ask:
+      - "How much does this cost?"
+      - "What's the ROI?"
+      - "How long until we see results?"
+      - "What's the implementation timeline?"
+
+  technical_buyer:
+    label: "Technical Buyer"
+    emoji: "🔍"
+    description: "Gatekeeper for security, compliance, and architecture approval"
+    typical_titles:
+      - "Security Engineer"
+      - "Compliance Manager"
+      - "Enterprise Architect"
+      - "CISO"
+      - "Security Lead"
+    seniority_levels:
+      - "Individual Contributor"
+      - "Manager"
+      - "Director"
+      - "VP"
+    cares_about:
+      - "Security and compliance"
+      - "Data privacy"
+      - "Vendor risk"
+      - "Integration with existing stack"
+    messaging_emphasis:
+      - "Security documentation"
+      - "Compliance certifications"
+      - "Architecture and data flow"
+      - "Access controls"
+    questions_they_ask:
+      - "How is data encrypted?"
+      - "What's your SLA?"
+      - "Are you SOC 2 compliant?"
+      - "Can we self-host?"
+
+  blocker:
+    label: "Blocker"
+    emoji: "🚫"
+    description: "Actively opposes your solution"
+    typical_titles:
+      - "Any role (context-dependent)"
+    seniority_levels:
+      - "Any"
+    cares_about:
+      - "Protecting current solution they built"
+      - "Job security"
+      - "Preference for competitor"
+      - "Political positioning"
+    messaging_emphasis:
+      - "Acknowledge their contribution"
+      - "Position as evolution, not replacement"
+      - "Address specific objections with data"
+      - "Work around via champion if possible"
+    questions_they_ask:
+      - "Why not just use [competitor]?"
+      - "Why can't we build this ourselves?"
+      - "What happens to our existing solution?"
+
+  end_user:
+    label: "End User"
+    emoji: "👤"
+    description: "Will use the product day-to-day"
+    typical_titles:
+      - "Software Engineer"
+      - "Frontend Developer"
+      - "Full-Stack Engineer"
+      - "Backend Engineer"
+    seniority_levels:
+      - "Individual Contributor"
+    cares_about:
+      - "Ease of use"
+      - "Fits their workflow"
+      - "Learning curve"
+      - "Daily productivity"
+    messaging_emphasis:
+      - "Show, don't tell (demos/trials)"
+      - "Ease of use"
+      - "Quick onboarding"
+      - "Productivity gains"
+    questions_they_ask:
+      - "Is it hard to learn?"
+      - "Does it work with my existing tools?"
+      - "Can I customize it?"
+
+  influencer:
+    label: "Influencer"
+    emoji: "🎤"
+    description: "Opinion carries weight, but no formal authority"
+    typical_titles:
+      - "Staff Engineer"
+      - "Principal Engineer"
+      - "Senior Architect"
+      - "Technical Advisor"
+    seniority_levels:
+      - "Individual Contributor"
+      - "Staff+"
+    cares_about:
+      - "Technical quality"
+      - "Long-term implications"
+      - "Architectural soundness"
+      - "Best practices"
+    messaging_emphasis:
+      - "Deep technical content"
+      - "Architecture discussions"
+      - "Thought leadership"
+      - "Technical credibility"
+    questions_they_ask:
+      - "How does this scale?"
+      - "What's the architecture?"
+      - "How does this compare to [technical alternative]?"
+
+# Persona Interaction Patterns
+# How personas typically interact with each other in buying process
+interaction_patterns:
+  - champion_engages_economic_buyer:
+      description: "Champion pitches to their boss (economic buyer)"
+      success_factors:
+        - "Champion has good business case"
+        - "Economic buyer trusts champion's judgment"
+        - "Timing is right (budget available)"
+
+  - technical_buyer_blocks:
+      description: "Technical buyer raises security/compliance concerns"
+      resolution:
+        - "Provide security documentation upfront"
+        - "Offer security review call"
+        - "Get certification they need (SOC 2, etc.)"
+
+  - influencer_sways_decision:
+      description: "Influencer's opinion shifts economic buyer's decision"
+      success_factors:
+        - "Influencer sees technical merit"
+        - "Economic buyer respects their opinion"
+        - "You've built credibility with influencer"
+
+# Usage Examples
+# How to use this file in pipelines:
+#
+# import yaml
+# with open('source/personas/personas.yaml') as f:
+#     personas = yaml.safe_load(f)
+#
+# # Get all champion job titles
+# champion_titles = personas['personas']['champion']['typical_titles']
+#
+# # Filter CRM contacts to find champions
+# df_champions = df[df['job_title'].isin(champion_titles)]
